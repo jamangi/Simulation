@@ -10,6 +10,7 @@ function clearLog(ele) {
 	ele.innerHTML = '';
 }
 
+
 function loadingClear() {
 	messageLog(actionModal.actionLoading, "");
 }
@@ -68,14 +69,11 @@ function returnLog(ele, msg) {
 }
 
 function reconnect(data) {
+	datastore['error'] = data;
 	toolbar.showConnect();
-	actionModal.messageLog(data['msg'])
-	actionModal.showSet();
+	actionModal.showError()
 }
 ////////// Drop (drop file) ////////////////
-function showDrop(){
-	toolbar.showStatus(datastore["userData"]);
-}
 function dropCallback(data) {
 	if (checkError(data))
 		reconnect(data);
@@ -84,8 +82,8 @@ function dropCallback(data) {
 		let worth = script["material"]
 		let img = "<img src='images/icons/material.gif' width=10 height=15>"
 		loadingReturn("Dropped script is worth "+ worth +" " + img + "");
-		setInterval(showDrop, 2000);
-		toolbar.showStatus(data);
+
+		toolbar.showStatus();
 		map.layScript(data);
 	}
 }
@@ -104,13 +102,14 @@ function dropSend() {
 	}
 }
 
+
 ////////// Run (Run scripts) ///////////
 function runCallback(data) {
 	if (checkError(data))
 		reconnect(data);
 	else{
 		actionModal.updateUser(data);
-		toolbar.showStatus(data);
+		toolbar.showStatus();
 		actionModal.updateCollect(datastore['userData']);
 		actionModal.showOutput(data);
 		if (data['result']['has_heart'])
@@ -140,22 +139,12 @@ function runSend() {
 }
 
 ////////// Set (set username, character, and ip) ///////////
-function setFormUpdate(char) {
+function updateFormUpdate(char) {
 	document.getElementById("actionRadioInput").value = char;
 }
 
-function setCallback(data) {
-	actionModal.clear();
-	if (checkError(data))
-		reconnect(data)
-	else{
-		toolbar.showStatus(data);
-		actionModal.showHeal(data);
-		window.connected = true;
-	}
-}
 
-function setSend() {
+function updateSend() {
 	let charInput = document.getElementById("actionRadioInput").value;
 	let nameEle = document.getElementById("actionNameInput")
 	let nameInput = nameEle.value;
@@ -165,7 +154,7 @@ function setSend() {
 	else {
 		data = {name: nameInput, character: charInput,
 				location: "training"}
-		datastore.set(setCallback, data)
+		datastore.update(userCallback, data)
 	}
 	// nameEle.value = '';
 }
@@ -179,8 +168,6 @@ function testCallback(data) {
 		let worth = data["material"]
 		let img = "<img src='images/icons/material.gif' width=10 height=15>"
 		loadingReturn("Script is worth "+ worth +" " + img + "");
-		if (connected)
-			setTimeout(showDrop, 2000);
 	}
 }
 
@@ -199,19 +186,39 @@ function testSend() {
 }
 
 
-////////// Touch (fetch username, character, and ip) ///////////
-function touchCallback(data) {
+///////////////////////////////////////////////////////////////
+////////// Auth Functions ////////////////
+//////////////////////////////////////////////////////////////
+
+/// load credentials
+function loadCredentials() {
+		datastore.loadCredentials(toolbar.connectUsername.value, toolbar.connectPassword.value);
+}
+
+
+/// UserConsole Callback ///
+function userCallback(data) {
 	actionModal.loadingOff();
 	if (checkError(data))
 		reconnect(data)
 	else{
-		toolbar.showStatus(data);
+		toolbar.showStatus();
 		actionModal.showHeal(data);
 		window.connected = true;
-	}
 }
-function touchSend() {
+
+
+////////// Create (New Player) ///////////
+function createSend() {
+	loadCredentials();
 	actionModal.loadingOn();
-	datastore.touch(touchCallback);
+	datastore.create(userCallback);
+}
+
+////////// Touch (fetch username, character, and ip) ///////////
+function touchSend() {
+	loadCredentials();
+	actionModal.loadingOn();
+	datastore.touch(userCallback);
 }
 

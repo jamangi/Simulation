@@ -30,26 +30,36 @@
 		</div>
 	</div>
 	</div>
-	<div class="form-group row" id="toolbarContainer">
+	<div class="form-group row" id="toolbarContainer" style="padding-left:50px">
     <form id="connectForm">
 
-        <div class="col-xs-6" style="background-color:black;">
+        <div class="col-xs-6 toolbar">
               <input type="text" class="form-control" id="connectUsername" placeholder="username" value="">
         </div>
-        <div class="col-xs-6" style="background-color:black;">
+        <div class="col-xs-6 toolbar">
               <input type="password" class="form-control" id="connectPassword" placeholder="password">
         </div>
 
     </form>
 
-    <div class="col-xs-6" style="background-color:black;">
-    	<div id="toolbar" class="btn-group">
+
+
+      <div class='btn-group-vertical' id="toolbarActionGroup" style="display:none;">
     		<button id="toolbarScript" type="button" class="btn btn-basic"
-    				data-toggle="modal" data-target="#actionModal">Script</button>
-		 		<button id="toolbarAction" type="button" class="btn btn-info"
+    				data-toggle="modal" data-target="#actionModal"></button>
+        <button id="toolbarAction" type="button" class="btn btn-success"
+            data-toggle="modal" data-target="#actionModal"></button>
+      </div>
+
+      <div class='btn-group-vertical' id="toolbarLoginGroup">
+		 		<button id="toolbarConnect" type="button" class="btn btn-basic"
 		 				data-toggle="modal" data-target="#actionModal">Connect</button>
-		  </div> 
-    </div>
+        <button id="toolbarNew" type="button" class="btn btn-basic"
+            data-toggle="modal" data-target="#actionModal">New Character</button>
+      </div>
+
+
+
 	 </div>
 	 
 </div>
@@ -77,27 +87,27 @@
   					<textarea class="form-control" rows="5" id="actionScripttext"></textarea>
 				</div>
           	</form>
-          	<form id="actionSetForm">
+          	<form id="actionUpdateForm">
         		<input type="text" class="form-control" id="actionNameInput" placeholder="username">
         		<input type="hidden" value="" id="actionRadioInput">
 			    <label class="radio-inline">
 			      <input type="radio" name="optradio" value="titan"
-			       onclick="setFormUpdate(this.value)">
+			       onclick="updateFormUpdate(this.value)">
 			      <img class="characterImg" src="images/characters/titan/titanWalkDown.gif">
 			    </label>
 			    <label class="radio-inline">
 			      <input type="radio" name="optradio" value="goku"
-			       onclick="setFormUpdate(this.value)">
+			       onclick="updateFormUpdate(this.value)">
 			      <img class="characterImg" src="images/characters/goku/gokuWalkDown.gif">
 			    </label>
 			    <label class="radio-inline">
 			      <input type="radio" name="optradio" value="solomon"
-			       onclick="setFormUpdate(this.value)">
+			       onclick="updateFormUpdate(this.value)">
 			      <img class="characterImg" src="images/characters/solomon/solomonWalkDown.gif">
 			    </label>
 			    <label class="radio-inline">
 			      <input type="radio" name="optradio" value="suzie"
-			       onclick="setFormUpdate(this.value)">
+			       onclick="updateFormUpdate(this.value)">
 			      <img class="characterImg" src="images/characters/suzie/suzieWalkDown.gif">
 			    </label>
 			    <button type='submit' class="btn btn-default">
@@ -111,7 +121,7 @@
         	<div id="actionButtons">
         		<button id="actionChangeButton" type="button" class="btn btn-warning">Change Avatar</button>
         		<button id="actionNewButton" type="button" class="btn btn-danger">New Container</button>
-        		<button id="actionSetButton" type="button" class="btn btn-info">Set</button>
+        		<button id="actionUpdateButton" type="button" class="btn btn-info">Update</button>
         		<button type="button" class="btn">D</button>
         		<button id="actionHealButton" type="button" class="btn btn-heal">Heal Container</button>
         		<button id="actionNewButton" type="button" class="btn btn-warning">New</button>
@@ -123,7 +133,8 @@
         		<button id="actionTestButton" type="button" class="btn btn-warning">Test</button>
         		<button id="actionRunButton" type="button" class="btn btn-danger"
         		data-toggle="modal" data-target="#actionOutputModal">Run</button>
-			</div>        
+		    	</div>      
+          <button id="actionOutputCloseButton" type="button" class="btn btn-default" data-dismiss="modal">Close</button>  
         </div>
       </div>
       
@@ -144,7 +155,7 @@
         </div>
         <div class="modal-body">
         	<p id="actionOutputLoading">loading...</p>
-            <p id="actionOutputContent"></p>
+            <textarea id="actionOutputContent" disabled></textarea>
         </div>
         <div class="modal-footer">
         	<div id="actionOutputButtons">

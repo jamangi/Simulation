@@ -16,10 +16,10 @@ class ActionModal {
 		this.actionHealButton = document.getElementById("actionHealButton");
 		this.actionNewButton = document.getElementById("actionNewButton");
 		this.actionRunButton = document.getElementById("actionRunButton");		
-		this.actionSetButton = document.getElementById("actionSetButton");
+		this.actionUpdateButton = document.getElementById("actionUpdateButton");
 		this.actionTestButton = document.getElementById("actionTestButton");
 
-		this.actionSetForm = document.getElementById("actionSetForm");
+		this.actionUpdateForm = document.getElementById("actionUpdateForm");
 		this.actionScriptForm = document.getElementById("actionScriptForm");
 		this.actionScriptname = document.getElementById('actionScriptname');
 		this.actionScripttext = document.getElementById('actionScripttext');	
@@ -29,9 +29,9 @@ class ActionModal {
 		this.actionOutputLoading = document.getElementById("actionOutputLoading");
 		this.actionOutputContent = document.getElementById("actionOutputContent");		
 		
-		this.actionSetForm.addEventListener('submit', function (evnt){
+		this.actionUpdateForm.addEventListener('submit', function (evnt){
 			evnt.preventDefault();
-			setSend();
+			updateSend();
 		});
 
 		this.actionChangeButton.addEventListener("click", function(){
@@ -109,16 +109,16 @@ class ActionModal {
 	}
 
 
-	showSet() {
+	showUpdate() {
 		this.clear();
-		this.actionContent.appendChild(this.actionSetForm);
+		this.actionContent.appendChild(this.actionUpdateForm);
 	}
 
 	showUpdate(data) {
 		this.clear();
 		this.updateUser(data);
 		this.showUser(data);
-		this.actionForm.appendChild(this.actionSetForm);
+		this.actionForm.appendChild(this.actionUpdateForm);
 	}
 
 	showUser(data) {
@@ -168,11 +168,17 @@ class ActionModal {
 			actionModal.actionButtons.appendChild(actionModal.actionTestButton);
 	}
 
+	showError() {
+		actionModal.clear();
+		let output = datastore['error']['msg'];
+		actionModal.actionContent.innerHTML = '<span style="color: darkred;">' + output+ '</span>';
+	}
+
 	showOutput(data) {
 		actionModal.clearOutput();
 		actionModal.appendOutputUserTitle(data);
 		let output = data['result']['output'];
-		actionModal.actionOutputContent.innerHTML = output;
+		actionModal.actionOutputContent.value = output; // must include newlines
 	}
 
 	updateCollect() {
