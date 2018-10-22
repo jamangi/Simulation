@@ -47,3 +47,7 @@ html, body, #gameboxContainer, #gamebox {position: relative; z-index: -1;}
 
 input, button {margin-top: 5px;}
 .toolbar {margin-top: 5px; padding-left: 0px;}
+
+#actionOutputContent, #actionScriptname, #actionScripttext {
+	cursor: default;
+}

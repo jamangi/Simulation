@@ -34,7 +34,8 @@
     <form id="connectForm">
 
         <div class="col-xs-6 toolbar">
-              <input type="text" class="form-control" id="connectUsername" placeholder="username" value="">
+              <input type="text" class="form-control" id="connectUsername" placeholder="username" value=""
+              autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         </div>
         <div class="col-xs-6 toolbar">
               <input type="password" class="form-control" id="connectPassword" placeholder="password">
@@ -44,7 +45,7 @@
 
 
 
-      <div class='btn-group-vertical' id="toolbarActionGroup" style="display:none;">
+      <div class='btn-group' id="toolbarActionGroup" style="display:none;">
     		<button id="toolbarScript" type="button" class="btn btn-basic"
     				data-toggle="modal" data-target="#actionModal"></button>
         <button id="toolbarAction" type="button" class="btn btn-success"
@@ -82,13 +83,16 @@
           <div id="actionForm">
           	<form id="actionScriptForm">
           		<div class="form-group">
-  					<label for="usr">Script Name:</label>
-  					<input type="text" class="form-control" id="actionScriptname">
-  					<textarea class="form-control" rows="5" id="actionScripttext"></textarea>
-				</div>
+      					<label for="usr">Script Name:</label>
+      					<input type="text" class="form-control" id="actionScriptname"
+                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      					<textarea class="form-control" rows="5" id="actionScripttext"
+                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+				      </div>
           	</form>
           	<form id="actionUpdateForm">
-        		<input type="text" class="form-control" id="actionNameInput" placeholder="username">
+        		<input type="text" class="form-control" id="actionNameInput" placeholder="username"
+            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         		<input type="hidden" value="" id="actionRadioInput">
 			    <label class="radio-inline">
 			      <input type="radio" name="optradio" value="titan"
@@ -124,13 +128,14 @@
         		<button id="actionUpdateButton" type="button" class="btn btn-info">Update</button>
         		<button type="button" class="btn">D</button>
         		<button id="actionHealButton" type="button" class="btn btn-heal">Heal Container</button>
-        		<button id="actionNewButton" type="button" class="btn btn-warning">New</button>
         		<button type="button" class="btn">D</button>
         		<button id="actionCollectButton" type="button" class="btn btn-success"
         		data-toggle="modal" data-target="#actionOutputModal">Collect</button>
         		<button type="button" class="btn">D</button>
-        		<button id="actionDropButton" type="button" class="btn btn-success">Drop</button>
-        		<button id="actionTestButton" type="button" class="btn btn-warning">Test</button>
+        		<button id="actionDropButton" type="button" class="btn btn-success"
+            data-toggle="modal" data-target="#actionOutputModal">Drop</button>
+        		<button id="actionTestButton" type="button" class="btn btn-warning"
+            data-toggle="modal" data-target="#actionOutputModal">Test</button>
         		<button id="actionRunButton" type="button" class="btn btn-danger"
         		data-toggle="modal" data-target="#actionOutputModal">Run</button>
 		    	</div>      
@@ -155,7 +160,8 @@
         </div>
         <div class="modal-body">
         	<p id="actionOutputLoading">loading...</p>
-            <textarea id="actionOutputContent" disabled></textarea>
+            <textarea class="form-control" id="actionOutputContent" rows="5" 
+            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
         </div>
         <div class="modal-footer">
         	<div id="actionOutputButtons">

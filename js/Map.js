@@ -38,7 +38,7 @@ class Map {
 	}
 
 	layScript(data) {
-		let script = data["script"];
+		let script = data['result']["script"];
 		script['user'] = data['user'];
 		let sid = script['id'];
 		let row = script['row'];

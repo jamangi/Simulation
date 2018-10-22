@@ -55,13 +55,15 @@ class Toolbar {
 
 
 	showStatus() {
+		if (!connected)
+			return;
 		this.clear();
 		let data = datastore["userData"];
 		this.toolbarContainer.appendChild(this.toolbarActionGroup);
 		let user = data["user"]
 		let form = user["form"]
 		this.toolbarScript.innerHTML = "Script";
-		this.toolbarAction.innerHTML = "<span class='text-capitalize'>" + user["name"] + "</span>";
+		this.toolbarAction.innerHTML = "<span class='text-capitalize'>" + user["username"] + "</span>";
 		if (form === "ghost")
 			this.toolbarAction.setAttribute("class", "btn btn-warning");
 		else

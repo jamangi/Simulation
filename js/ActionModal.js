@@ -20,6 +20,8 @@ class ActionModal {
 		this.actionTestButton = document.getElementById("actionTestButton");
 
 		this.actionUpdateForm = document.getElementById("actionUpdateForm");
+		this.actionNameInput = document.getElementById("actionNameInput");
+
 		this.actionScriptForm = document.getElementById("actionScriptForm");
 		this.actionScriptname = document.getElementById('actionScriptname');
 		this.actionScripttext = document.getElementById('actionScripttext');	
@@ -35,12 +37,16 @@ class ActionModal {
 		});
 
 		this.actionChangeButton.addEventListener("click", function(){
-			actionModal.showUpdate(datastore["userData"]);
+			actionModal.showUpdate(datastore['userData']);
 		});
 
 		this.actionDropButton.addEventListener('click', function(){dropSend();})
+		this.actionCollectButton.addEventListener('click', function(){collectSend();})
 		this.actionTestButton.addEventListener('click', function(){testSend();})
 		this.actionRunButton.addEventListener('click', function(){runSend();})
+
+		this.actionHealButton.addEventListener('click', function(){healSend();})
+		this.actionNewButton.addEventListener('click', function(){newSend();})
 
 		this.components = [this.actionTitle, this.actionContent,
 						   this.actionButtons, this.actionForm];
@@ -54,28 +60,26 @@ class ActionModal {
 
 	//////////////  api /////////////////////////
 
-	appendUserTitle(data) {
-		let u = data["user"];
-		let name = u["name"];
-		let form = u["form"];
+	appenduserHeader(data, ele, eleImg, useOutput) {
+		let userData = data["user"];
+		let username = userData["username"];
+		if (useOutput)
+			username = "Output";
+		let form = userData["form"];
 		let imgdir = "images/characters/"
 		let img = imgdir+form+"/"+form+"WalkDown.gif";
-		messageLog(this.actionTitle, "<h2 style='float:right'; class='text-capitalize'>"
-				  +name+"</h2>");
-		this.actionTitleImg.setAttribute('src',img);
-		this.actionTitle.appendChild(this.actionTitleImg);
+		messageLog(ele, "<h2 style='float:right'; class='text-capitalize'>"
+				  +username+"</h2>");
+		eleImg.setAttribute('src',img);
+		ele.appendChild(eleImg);
+	}
+
+	appendUserTitle(data) {
+		this.appenduserHeader(data, this.actionTitle, this.actionTitleImg);
 	}
 
 	appendOutputUserTitle(data) {
-		let u = data["user"];
-		let name = u["name"];
-		let form = u["form"];
-		let imgdir = "images/characters/"
-		let img = imgdir+form+"/"+form+"WalkDown.gif";
-		messageLog(this.actionOutputTitle, "<h2 style='float:right'; class='text-capitalize'>"
-				  +name+"</h2>");
-		this.actionOutputTitleImg.setAttribute('src',img);
-		this.actionOutputTitle.appendChild(this.actionOutputTitleImg);
+		this.appenduserHeader(data, this.actionOutputTitle, this.actionOutputTitleImg, true);
 	}
 
 	clear() {
@@ -90,6 +94,7 @@ class ActionModal {
 			while (component.lastChild) 
 				component.removeChild(component.lastChild);
 		this.loadingOutputOff();
+		actionModal.actionOutputContent.value = ''
 	}
 
 	loadingOn(){loadingLog();}
@@ -108,14 +113,9 @@ class ActionModal {
 		messageLog(this.actionLoading, msg);
 	}
 
-
-	showUpdate() {
-		this.clear();
-		this.actionContent.appendChild(this.actionUpdateForm);
-	}
-
 	showUpdate(data) {
 		this.clear();
+		this.actionNameInput.value = datastore.username;
 		this.updateUser(data);
 		this.showUser(data);
 		this.actionForm.appendChild(this.actionUpdateForm);
@@ -128,8 +128,8 @@ class ActionModal {
 	}
 
 	showHeal(data) {
-		this.showUser(data);
-		this.updateUser(data);
+		this.showUser(datastore['userData']);
+		this.updateUser();
 		this.actionButtons.appendChild(this.actionChangeButton);
 		this.actionButtons.appendChild(this.actionHealButton);
 		this.actionButtons.appendChild(this.actionNewButton);
@@ -142,6 +142,8 @@ class ActionModal {
 
 		actionModal.actionScriptname.value = '';
 		actionModal.actionScripttext.value = '';
+		// actionModal.actionScriptname.removeAttribute("disabled");
+		// actionModal.actionScripttext.removeAttribute("disabled");
 		this.actionForm.appendChild(this.actionScriptForm);
 
 		this.actionButtons.appendChild(this.actionRunButton);
@@ -149,46 +151,49 @@ class ActionModal {
 		this.actionButtons.appendChild(this.actionDropButton);
 	}
 	
-	showCollect() {
+	showCollect() { // listener added to scripts in Map.js
 		actionModal.clear();
 		let data = JSON.parse(this.getAttribute("data-script"));
+		let userData = data['user']
 		actionModal.appendUserTitle(data);
 
 		let scriptname = data['filename'];
 		let scripttext = data['filetext'];
+		let scriptid = data['id'];
+		window.selectedID = scriptid;
+
 		actionModal.actionScriptname.value = scriptname;
 		actionModal.actionScripttext.value = scripttext;
+		// actionModal.actionScriptname.setAttribute("disabled", true);
+		// actionModal.actionScripttext.setAttribute("disabled", true);
 		actionModal.actionForm.appendChild(actionModal.actionScriptForm);
+		actionModal.actionButtons.appendChild(actionModal.actionTestButton);
 		if (connected)
 			if (window.user.ID === data['user']['id'])
 				actionModal.actionButtons.appendChild(actionModal.actionRunButton);
 			else
 				actionModal.actionButtons.appendChild(actionModal.actionCollectButton);
-		else
-			actionModal.actionButtons.appendChild(actionModal.actionTestButton);
 	}
 
 	showError() {
 		actionModal.clear();
 		let output = datastore['error']['msg'];
-		actionModal.actionContent.innerHTML = '<span style="color: darkred;">' + output+ '</span>';
+		// actionModal.actionContent.innerHTML = '<span style="color: darkred;">' + output+ '</span>';
+		messageLog(actionModal.actionContent, '<span style="color: darkred;">' + output+ '</span>')
+		messageLog(actionModal.actionOutputLoading, '<span style="color: darkred;">' + output+ '</span>')
 	}
 
-	showOutput(data) {
+	showOutput(output) {
 		actionModal.clearOutput();
-		actionModal.appendOutputUserTitle(data);
-		let output = data['result']['output'];
-		actionModal.actionOutputContent.value = output; // must include newlines
+		actionModal.appendOutputUserTitle(datastore['userData']);
+		actionModal.actionOutputContent.value = output;
 	}
 
-	updateCollect() {
-		actionModal.appendUserTitle(datastore['userData']);
-	}
-
-	updateUser(data) {
+	updateUser() {
+		let data = datastore['userData'];
 		user.changeID(data["user"]["id"]);
 		user.character = data["user"]["form"];
-		user.name = data["user"]["name"];
+		user.username = data["user"]["username"];
 		user.location = data["user"]["location"];
 		user.total_collected = data["user"]["total_collected"];
 		user.total_dropped = data["user"]["total_dropped"];

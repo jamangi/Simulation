@@ -26,7 +26,7 @@ function loadingOutputClear(){
 }
 
 function loadingOutputLog (){
-	let load = "<span style='color:darkgreen;'> loading... </span>";
+	let load = "<span style='color:#ff761a;'> running... </span>";
 	messageLog(actionModal.actionOutputLoading, load);
 }
 function loadingOutputReturn(html) {
@@ -41,7 +41,7 @@ function printError(display, data) {
 }
 
 function printUser(display, data) {
-	let props = ["name", "id", "location",
+	let props = ["username", "id", "location",
 				 "character", "form", "material",
 				 "total_collected", "total_dropped"]
 
@@ -70,129 +70,95 @@ function returnLog(ele, msg) {
 
 function reconnect(data) {
 	datastore['error'] = data;
-	toolbar.showConnect();
+	// toolbar.showConnect();
 	actionModal.showError()
 }
-////////// Drop (drop file) ////////////////
-function dropCallback(data) {
-	if (checkError(data))
+
+////////// Output Callback /////////////////
+function outputCallback(data, printMaterial) {
+	if (checkError(data)){
 		reconnect(data);
+		return false;
+	}
 	else{
-		let script = data["script"];
-		let worth = script["material"]
+		let output = data['result']['output'];
+		let hasHeart = data['result']['has_heart'];
+		let material = data['result']['material'];
 		let img = "<img src='images/icons/material.gif' width=10 height=15>"
-		loadingReturn("Dropped script is worth "+ worth +" " + img + "");
+		let msg = "Script is worth "+ material +" " + img + "";
+		if (printMaterial){
+			loadingReturn(msg); // drop collect test || run
+		}
 
+		actionModal.updateUser();
+		actionModal.showOutput(output);
 		toolbar.showStatus();
-		map.layScript(data);
-	}
-}
 
-function dropSend() {
-	let actionScriptname = document.getElementById("actionScriptname");
-	let actionScripttext = document.getElementById("actionScripttext");
-	if (actionScriptname.value.lenth === 0 || actionScripttext.value.length === 0)
-		actionModal.messageLog("<small style='color:darkred;'>script name and text needed</small>")
-	else {
-		actionModal.loadingOn();
-		data = {filename: actionScriptname.value,
-				filetext: actionScripttext.value,
-				row: user.row, col: user.col};
-		datastore.drop(dropCallback, data)
-	}
-}
-
-
-////////// Run (Run scripts) ///////////
-function runCallback(data) {
-	if (checkError(data))
-		reconnect(data);
-	else{
-		actionModal.updateUser(data);
-		toolbar.showStatus();
-		actionModal.updateCollect(datastore['userData']);
-		actionModal.showOutput(data);
-		if (data['result']['has_heart'])
+		if (hasHeart)
 			loadingOutputReturn("<small style='color:darkgreen;'>script ran safely</small>");
-		else if (data['result']['has_heart'] !== null)
-			loadingOutputReturn("<small style='color:orange;'>heart file was destroyed</small>");
+		else if (hasHeart !== null)
+			loadingOutputReturn("<small style='color:#ff761a;'>heart file was destroyed</small>");
 		else
 			loadingOutputReturn("<small style='color:darkred;'>script failed to run</small>");
-
+		return true;
 	}
 }
 
-function runSend() {
+function outputSend(method, callback) {
+	actionModal.clearOutput();
 	let actionScriptname = document.getElementById("actionScriptname");
 	let actionScripttext = document.getElementById("actionScripttext");
 	if (actionScriptname.value.lenth === 0 || actionScripttext.value.length === 0)
 		actionModal.messageLog("<small style='color:darkred;'>script name and text needed</small>")
 	else {
 		actionModal.clearOutput();
-		actionModal.appendOutputUserTitle(datastore['userData']);
+		actionModal.loadingOn();
 		actionModal.loadingOutputOn();
+		if (datastore['userData'])
+			actionModal.appendOutputUserTitle(datastore['userData']);
 		data = {filename: actionScriptname.value,
 				filetext: actionScripttext.value,
-				row: user.row, col: user.col};
-		datastore.run(runCallback, data)
+				row: user.row, col: user.col, fileid: window.selectedID};
+		datastore[method](callback, data)
 	}
 }
 
-////////// Set (set username, character, and ip) ///////////
-function updateFormUpdate(char) {
-	document.getElementById("actionRadioInput").value = char;
+////////// Collect (collect file) //////////
+function collectCallback(data) {
+	if (outputCallback(data, false))
+		actionModal.appendUserTitle(data);
 }
+function collectSend() {outputSend('collect', collectCallback);}
 
-
-function updateSend() {
-	let charInput = document.getElementById("actionRadioInput").value;
-	let nameEle = document.getElementById("actionNameInput")
-	let nameInput = nameEle.value;
-
-	if (charInput.lenth === 0 || nameInput.length === 0)
-		actionModal.messageLog("<small style='color:darkred;'>character and name must be selected</small>")
-	else {
-		data = {name: nameInput, character: charInput,
-				location: "training"}
-		datastore.update(userCallback, data)
-	}
-	// nameEle.value = '';
+////////// Drop (drop file) ////////////////
+function dropCallback(data) {
+	if (outputCallback(data, false));
+		map.layScript(data)
 }
+function dropSend() {outputSend('drop', dropCallback);}
+
+////////// Run (Run scripts) ///////////
+function runCallback(data) {
+	outputCallback(data, false);
+	actionModal.appendUserTitle(data);
+}
+function runSend() {outputSend('run', runCallback);}
 
 ////////// Test (test script) ///////////
-function testCallback(data) {
-	if (checkError(data))
-		reconnect(data);
-	else{
-		let script = data["script"];
-		let worth = data["material"]
-		let img = "<img src='images/icons/material.gif' width=10 height=15>"
-		loadingReturn("Script is worth "+ worth +" " + img + "");
-	}
-}
-
-function testSend() {
-	let actionScriptname = document.getElementById("actionScriptname");
-	let actionScripttext = document.getElementById("actionScripttext");
-	if (actionScriptname.value.lenth === 0 || actionScripttext.value.length === 0)
-		actionModal.messageLog("<small style='color:darkred;'>script name and text needed</small>")
-	else {
-		actionModal.loadingOn();
-		data = {filename: actionScriptname.value,
-				filetext: actionScripttext.value,
-				row: user.row, col: user.col};
-		datastore.test(testCallback, data)
-	}
-}
-
+function testCallback(data) {outputCallback(data, true);}
+function testSend() 		{outputSend('test', testCallback);}
 
 ///////////////////////////////////////////////////////////////
-////////// Auth Functions ////////////////
+////////// User Functions ////////////////
 //////////////////////////////////////////////////////////////
 
 /// load credentials
 function loadCredentials() {
 		datastore.loadCredentials(toolbar.connectUsername.value, toolbar.connectPassword.value);
+}
+
+function loadUsername(username) {
+	datastore.loadCredentials(username, datastore['password']);
 }
 
 
@@ -202,9 +168,10 @@ function userCallback(data) {
 	if (checkError(data))
 		reconnect(data)
 	else{
+		window.connected = true;
 		toolbar.showStatus();
 		actionModal.showHeal(data);
-		window.connected = true;
+	}
 }
 
 
@@ -215,10 +182,43 @@ function createSend() {
 	datastore.create(userCallback);
 }
 
+////////// New (New Container) ///////////
+function newSend() {
+	loadCredentials();
+	actionModal.loadingOn();
+	datastore.full_restore(userCallback);
+}
+
+////////// Heal (Heal Container) ///////////
+function healSend() {
+	loadCredentials();
+	actionModal.loadingOn();
+	datastore.heal(userCallback);
+}
+
 ////////// Touch (fetch username, character, and ip) ///////////
 function touchSend() {
 	loadCredentials();
 	actionModal.loadingOn();
 	datastore.touch(userCallback);
+}
+
+////////// Update (update username, character, and ip) ///////////
+function updateFormUpdate(char) {
+	document.getElementById("actionRadioInput").value = char;
+}
+
+function updateSend() {
+	let charInput = document.getElementById("actionRadioInput").value;
+	let nameInput = document.getElementById("actionNameInput").value;
+	loadUsername(nameInput)
+
+	if (charInput.lenth === 0 || nameInput.length === 0)
+		actionModal.messageLog("<small style='color:darkred;'>character and name must be selected</small>")
+	else {
+		data = {character: charInput,
+				location: "training"}
+		datastore.update(userCallback, data)
+	}
 }
 
