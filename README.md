@@ -1,2 +1,2 @@
 # Simulation
-A Simulation of docker hearts
+Simulation of docker hearts
